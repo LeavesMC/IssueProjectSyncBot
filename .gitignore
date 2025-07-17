@@ -1,0 +1,11 @@
+# Project Configs
+.idea
+
+# Node Modules
+node_modules
+
+# Cache
+dist
+.env
+
+private-key.pem

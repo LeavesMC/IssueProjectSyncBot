@@ -1,0 +1,25 @@
+{
+  "name": "issue-project-sync",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev:http": "nodemon src/httpEntry.ts",
+    "build": "tsc",
+    "start": "node dist/httpEntry.js"
+  },
+  "dependencies": {
+    "@octokit/graphql": "^9.0.1",
+    "@vclight/router": "^1.5.2",
+    "axios": "^1.10.0",
+    "dotenv": "^17.1.0",
+    "log4js": "^6.9.1",
+    "vclight": "^3.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.10",
+    "jsonwebtoken": "^9.0.2",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
