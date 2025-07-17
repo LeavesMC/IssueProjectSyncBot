@@ -7,6 +7,6 @@ const server = http.createServer();
 server.on("request", app.httpHandler());
 
 server.listen(env.port, () => {
-    console.log("VCLight serve");
+    console.log("LeavesMC Issue Project Sync Bot");
     console.log(`> Ready! Available at http://localhost:${env.port}`);
 });

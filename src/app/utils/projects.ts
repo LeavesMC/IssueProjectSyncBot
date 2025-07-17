@@ -125,7 +125,5 @@ export async function setProjectItemFieldValue(
             singleSelectOptionId: fieldValue,
         },
     };
-
-    const result = await graphql.post("", {query, variables});
-    console.log(result.data);
+    await graphql.post("", {query, variables});
 }

@@ -20,7 +20,7 @@ export async function handleIssueEvent(body: any): Promise<string | undefined> {
 
     const label = getLabelFromBodyOrIssue(body, issue);
     const projectType = getProjectTypeByLabel(label);
-    if (!projectType) return;
+    if (!projectType) return "Invalid project type";
 
     const repoFullName = body.repository.full_name;
     if (!repoFullName) return "Invalid repository full name";
@@ -48,19 +48,21 @@ export async function handleIssueEvent(body: any): Promise<string | undefined> {
             if (!projectFieldOptionNodeId) return "Invalid project field option node ID";
 
             await setProjectItemFieldValue(projectNodeId, issueItemNodeId, projectFieldNodeId, projectFieldOptionNodeId);
+
+            console.log(`Issue ${issue.number} in repository ${repoName} has been updated with project type ${projectType}.`);
         }
     }
     return "Success";
 }
 
-function getLabelFromBodyOrIssue(body: any, issue: any): any {
+function getLabelFromBodyOrIssue(body: any, issue: any): string {
     let label = body.label;
-    if (label) return;
+    if (label) return label;
     return issue.labels.find(
         (it: { name: string }) => labelMap.some(
             l => l.labels.includes(it.name),
         ),
-    );
+    ).name;
 }
 
 function getProjectIdByIssue(issue: any): number | undefined {

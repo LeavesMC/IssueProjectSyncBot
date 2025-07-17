@@ -36,7 +36,6 @@ export async function getProjectFieldOptionNodeId(
     `;
     const variables = { projectId, orgLoginName };
     const res = await graphql.post("", { query, variables });
-    console.log(res.data);
     const fields = res.data?.data?.organization?.projectV2?.fields?.nodes;
     if (!fields) return undefined;
     const field = fields.find((f: any) => f.name === fieldName);
