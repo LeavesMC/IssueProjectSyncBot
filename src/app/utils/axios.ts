@@ -1,10 +1,10 @@
 import axios from "axios";
-import env from "./env";
+import { token } from "./token";
 
 const graphql = axios.create({
     baseURL: "https://api.github.com/graphql",
     headers: {
-        Authorization: `bearer ${env.appAccessToken}`,
+        Authorization: `bearer ${token}`,
     },
 });
 

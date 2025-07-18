@@ -8,10 +8,11 @@ export async function withRetry<T>(
     attempt: number = 0,
 ): Promise<T> {
     try {
-        logger.info(`Attempt ${attempt + 1} for task: ${opName}`);
+        if (attempt !== 0) logger.info(`Attempt ${attempt + 1} for task: ${opName}`);
         return await fn();
     } catch (err) {
         if (attempt >= maxRetries) throw new Error(`Task ${opName} failed after ${attempt + 1} attempts: ${err}`);
+        logger.warn(err);
         logger.warn(`Task [${opName}] failed on attempt ${attempt + 1}: ${err}. Retrying in ${delay}ms...`);
         await new Promise(res => setTimeout(res, delay));
         return withRetry(fn, opName, maxRetries, delay * 2, attempt + 1);

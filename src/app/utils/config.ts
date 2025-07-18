@@ -1,11 +1,14 @@
-export const typeMap = [
+export const orgLoginName = "Xor7Studio"
+
+export const projectData = [
     {
         name: "Feature",
         projectId: 1,
+        repo: "Leaves-ci-test"
     },
 ];
 
-export const labelMap = [
+export const typeLabelData = [
     {
         type: "🕑 Needs Triage",
         labels: ["status: needs triage"],
@@ -28,3 +31,4 @@ export const labelMap = [
     },
 ];
 
+export const allStatusLabels = typeLabelData.flatMap(it => it.labels);

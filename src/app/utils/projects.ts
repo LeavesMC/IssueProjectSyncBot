@@ -1,7 +1,96 @@
 import { projectFieldNodeIdMap, projectNodeIdMap } from "./cache";
 import graphql from "./axios";
+import { allStatusLabels, orgLoginName, projectData, typeLabelData } from "./config";
+import {
+    addLabelToIssue,
+    getIssueLabels,
+    getValidIssueNumber,
+    getValidRepoLabelNodeId,
+    removeLabelFromIssue,
+} from "./issues";
+import { logger } from "./log";
 
-export async function getProjectNodeId(orgLoginName: string, projectId: number): Promise<string | undefined> {
+const listenActions = [
+    "edited",
+];
+
+export async function handleProjectItemEvent(body: any) {
+    if (!isValidAction(body.action)) return;
+
+    const newLabelName = getValidNewIssueLabelName(body);
+    if (!newLabelName) return;
+    const newLabelType = typeLabelData.find(it => it.labels.includes(newLabelName));
+    if (!newLabelType) return;
+
+    const projectItem = getValidProjectItem(body);
+    const projectData = getValidProjectData(projectItem);
+    const repoName = projectData.repo;
+    const issueNodeId = getValidIssueNodeId(projectItem);
+    const issueNumber = await getValidIssueNumber(repoName, issueNodeId);
+    const labelNodeId = await getValidRepoLabelNodeId(repoName, newLabelName);
+    const issueLabels: { id: string, name: string }[] = await getIssueLabels(repoName, issueNumber);
+
+    if (issueLabels.some(it => it.name === newLabelName)) return;
+    if (issueLabels.some(it => newLabelType.labels.includes(it.name))) return;
+
+    const forRemoval = issueLabels
+        .filter(it => allStatusLabels.includes(it.name))
+        .filter(it => it.name !== newLabelName);
+    if (forRemoval.length === 0) return;
+
+    for (const it of forRemoval) {
+        await removeLabelFromIssue(issueNodeId, it.id);
+    }
+    const removedLabels = forRemoval.map(it => it.name).join(", ");
+    logger.info(`[Project => Issue] Issue ${repoName}#${issueNumber} no longer labeled as [${removedLabels}]`);
+
+    await addLabelToIssue(issueNodeId, labelNodeId);
+    logger.info(`[Project => Issue] Issue ${repoName}#${issueNumber} now labeled as [${newLabelName}]`);
+}
+
+function isValidAction(action: any): boolean {
+    return !!action && typeof action === "string" && listenActions.includes(action);
+}
+
+function getValidNewIssueLabelName(body: any): string | undefined {
+    const newTypeName = getNewTypeName(body);
+    if (!newTypeName) return undefined;
+    return typeLabelData
+        .find(it => it.type === newTypeName)
+        ?.labels[0];
+}
+
+function getValidProjectData(projectItem: any) {
+    const projectData = getProjectData(projectItem);
+    if (!projectData) throw new Error("Project data not found");
+    return projectData;
+}
+
+function getValidProjectItem(body: any): any {
+    const item = body.projects_v2_item;
+    if (!item || !item["content_type"] || !item["content_node_id"] || !item["project_node_id"]) throw new Error("Invalid project item data");
+    return item;
+}
+
+function getValidIssueNodeId(projectItem: any): string {
+    const issueNodeId = projectItem.content_node_id;
+    if (!issueNodeId) throw new Error("Issue nodeId not found in project item");
+    return issueNodeId;
+}
+
+function getNewTypeName(body: any): string | undefined {
+    const changes = body.changes;
+    if (!changes || !changes.field_value || !changes.field_value.to || !changes.field_value.to.name) return undefined;
+    return changes.field_value.to.name;
+}
+
+function getProjectData(projectItem: any) {
+    const projectNodeId = projectItem.project_node_id;
+    if (!projectNodeId || typeof projectNodeId !== "string") return undefined;
+    return projectData.find(async it => await getProjectNodeId(it.projectId) === projectNodeId);
+}
+
+export async function getProjectNodeId(projectId: number): Promise<string | undefined> {
     const cache = projectNodeIdMap.get(projectId);
     if (cache) return cache.toString();
     const query = `
@@ -23,7 +112,6 @@ export async function getProjectNodeId(orgLoginName: string, projectId: number):
 }
 
 export async function getProjectFieldNodeId(
-    orgLoginName: string,
     projectId: number,
     fieldName: string,
 ): Promise<string | undefined> {
@@ -95,35 +183,4 @@ export async function getOrAddIssueToProject(
     const addVariables = {projectId: projectNodeId, contentId: issueNodeId};
     const addRes = await graphql.post("", {query: addQuery, variables: addVariables});
     return addRes.data?.data?.addProjectV2ItemById?.item?.id;
-}
-
-export async function setProjectItemFieldValue(
-    projectNodeId: string,
-    itemNodeId: string,
-    fieldNodeId: string,
-    fieldValue: string,
-): Promise<void> {
-    const query = `
-      mutation($projectId:ID!, $itemId:ID!, $fieldId:ID!, $value:ProjectV2FieldValue!) {
-        updateProjectV2ItemFieldValue(input: {
-          projectId: $projectId,
-          itemId: $itemId,
-          fieldId: $fieldId,
-          value: $value
-        }) {
-          projectV2Item {
-            id
-          }
-        }
-      }
-    `;
-    const variables = {
-        projectId: projectNodeId,
-        itemId: itemNodeId,
-        fieldId: fieldNodeId,
-        value: {
-            singleSelectOptionId: fieldValue,
-        },
-    };
-    await graphql.post("", {query, variables});
 }
