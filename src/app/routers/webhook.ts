@@ -1,20 +1,35 @@
 import router from "../router";
 import { handleIssueEvent } from "../utils/issues";
-import { RequestContext } from "@vclight/router";
 import { withRetry } from "../utils/retry";
 import { logger } from "../utils/log";
 import { handleProjectItemEvent } from "../utils/projects";
+import { Webhooks } from "@octokit/webhooks";
+import env from "../utils/env";
+
+const webhooks = new Webhooks({
+    secret: env.webhookSecret,
+});
 
 router.on("/webhook", async (request, response) => {
-    handleRequest(request).then().catch((err) => logger.error(err));
+    const headers = request.headers;
+
+    const body = request.body;
+    const eventName = headers["x-github-event"];
+    const signature = headers["x-hub-signature-256"];
+    if (!(typeof signature === "string") || !(await webhooks.verify(JSON.stringify(body), signature))) {
+        response.status = 401;
+        return;
+    }
+    if (!eventName || typeof eventName !== "string") {
+        response.status = 400;
+        return;
+    }
+    handleRequest(eventName, body).then().catch((err) => logger.error(err));
     response.status = 200;
 });
 
-async function handleRequest(request: RequestContext) {
-    const headers = request.headers;
-    const body = await request.body;
-    const eventName = headers["x-github-event"];
-    if (!eventName || typeof eventName !== "string") return;
+async function handleRequest(eventName: string, body: any): Promise<void> {
+
 
     const handlers: Record<string, (body: any) => Promise<void>> = {
         issues: handleIssueEvent,
