@@ -1,10 +1,15 @@
-export const orgLoginName = "Xor7Studio"
+export const orgLoginName = "LeavesMC"
 
 export const projectData = [
     {
-        name: "Feature",
-        projectId: 1,
-        repo: "Leaves-ci-test"
+        name: "Leaves Issue: Bug",
+        projectId: 8,
+        repo: "Leaves",
+    },
+    {
+        name: "Leaves Issue: Feature",
+        projectId: 9,
+        repo: "Leaves"
     },
 ];
 
