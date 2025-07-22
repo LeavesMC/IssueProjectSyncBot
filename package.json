@@ -9,7 +9,6 @@
   },
   "dependencies": {
     "@octokit/graphql": "^9.0.1",
-    "@octokit/webhooks": "^14.1.1",
     "@vclight/router": "^1.5.2",
     "axios": "^1.10.0",
     "dotenv": "^17.1.0",

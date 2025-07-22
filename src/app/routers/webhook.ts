@@ -3,12 +3,7 @@ import { handleIssueEvent } from "../utils/issues";
 import { withRetry } from "../utils/retry";
 import { logger } from "../utils/log";
 import { handleProjectItemEvent } from "../utils/projects";
-import { Webhooks } from "@octokit/webhooks";
-import env from "../utils/env";
-
-const webhooks = new Webhooks({
-    secret: env.webhookSecret,
-});
+import { verify } from "../utils/auth";
 
 router.on("/webhook", async (request, response) => {
     const headers = request.headers;
@@ -16,7 +11,7 @@ router.on("/webhook", async (request, response) => {
     const body = request.body;
     const eventName = headers["x-github-event"];
     const signature = headers["x-hub-signature-256"];
-    if (!(typeof signature === "string") || !(await webhooks.verify(JSON.stringify(body), signature))) {
+    if (!(typeof signature === "string") || !(await verify(signature, JSON.stringify(body)))) {
         response.status = 401;
         return;
     }
