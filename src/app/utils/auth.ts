@@ -1,4 +1,5 @@
 import env from "./env";
+import * as crypto from 'crypto';
 
 let encoder = new TextEncoder();
 
