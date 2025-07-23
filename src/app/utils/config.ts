@@ -1,4 +1,4 @@
-export const orgLoginName = "LeavesMC"
+export const orgLoginName = "LeavesMC";
 
 export const projectData = [
     {
@@ -9,7 +9,7 @@ export const projectData = [
     {
         typeName: "Feature",
         projectId: 9,
-        repo: "Leaves"
+        repo: "Leaves",
     },
 ];
 
@@ -20,7 +20,11 @@ export const typeLabelData = [
     },
     {
         type: "⌛ Awaiting Response",
-        labels: ["resolution: awaiting response", "status: needs testing", "status: distribute to upstream"],
+        labels: [
+            "resolution: awaiting response",
+            "status: needs testing",
+            "status: distribute to upstream",
+        ],
     },
     {
         type: "⏳ Awaiting Merging",
@@ -28,11 +32,29 @@ export const typeLabelData = [
     },
     {
         type: "🔨 Working",
-        labels: ["status: in progress", "status: blocked"],
+        labels: [
+            "status: in progress",
+            "status: blocked",
+        ],
     },
     {
         type: "✅ Accepted",
         labels: ["status: accepted"],
+    },
+    {
+        type: "Done",
+        labels: ["resolution: fixed / done"],
+    },
+    {
+        type: "Invalid",
+        labels: [
+            "resolution: invalid",
+            "resolution: unsupported",
+            "resolution: won't fix",
+            "resolution: works as intended",
+            "resolution: duplicate",
+            "resolution: already",
+        ],
     },
 ];
 
