@@ -2,12 +2,12 @@ export const orgLoginName = "LeavesMC"
 
 export const projectData = [
     {
-        name: "Leaves Issue: Bug",
+        typeName: "Bug",
         projectId: 8,
         repo: "Leaves",
     },
     {
-        name: "Leaves Issue: Feature",
+        typeName: "Feature",
         projectId: 9,
         repo: "Leaves"
     },

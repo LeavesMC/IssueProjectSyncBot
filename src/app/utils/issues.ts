@@ -14,7 +14,8 @@ export async function handleIssueEvent(body: any) {
     if (!isValidAction(body.action)) return;
 
     const issue = getValidIssue(body);
-    const projectId = getValidProjectId(issue);
+    const projectId = getProjectIdByIssue(issue);
+    if (!projectId) return;
     const label = getLabelFromBodyOrIssue(body, issue);
     if (!allStatusLabels.includes(label.name)) return;
 
@@ -44,12 +45,6 @@ function getValidIssue(body: any): any {
     const issue = body.issue;
     if (!issue || !issue.number || !issue.state || issue.state !== "open") throw new Error("Invalid issue data");
     return issue;
-}
-
-function getValidProjectId(issue: any): number {
-    const projectId = getProjectIdByIssue(issue);
-    if (!projectId) throw new Error("Project id not found for the issue");
-    return projectId;
 }
 
 function getValidProjectName(issue: any): string {
@@ -124,7 +119,7 @@ function getLabelFromBodyOrIssue(body: any, issue: any): any {
 
 function getProjectIdByIssue(issue: any): number | undefined {
     const projectName = getProjectNameByIssue(issue);
-    return projectData.find(it => it.name === projectName)?.projectId;
+    return projectData.find(it => it.typeName === projectName)?.projectId;
 }
 
 function getProjectNameByIssue(issue: any): string {
@@ -133,7 +128,7 @@ function getProjectNameByIssue(issue: any): string {
 
 function getProjectRepoByIssue(issue: any): string | undefined {
     const projectName = getProjectNameByIssue(issue);
-    return projectData.find(it => it.name === projectName)?.repo;
+    return projectData.find(it => it.typeName === projectName)?.repo;
 }
 
 function getProjectTypeByLabel(label: any): string | undefined {
