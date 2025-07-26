@@ -6,7 +6,7 @@ import { FIELDS, getProjectFieldOptionNodeId, getProjectItemFieldValue, setProje
 import { logger } from "./log";
 
 const listenActions = [
-    "reopened",
+    // "reopened", // this will conflict with github-project-automation
     "labeled",
 ];
 
