@@ -11,6 +11,7 @@ const env = {
     githubAppPrivateKey: process.env.GITHUB_APP_PRIVATE_KEY!,
     githubAccessTokenExpiresIn: parseInt(process.env.GITHUB_ACCESS_TOKEN_EXPIRES_IN || "50", 10),
     githubAccessTokenRefreshInterval: parseInt(process.env.GITHUB_ACCESS_TOKEN_REFRESH_INTERVAL || "45", 10),
+    githubAppName: process.env.GITHUB_APP_NAME || "issue-project-sync-bot",
     webhookSecret: process.env.GITHUB_WEBHOOK_SECRET!,
 };
 

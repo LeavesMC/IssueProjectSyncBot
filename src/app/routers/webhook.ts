@@ -3,6 +3,7 @@ import { handleIssueEvent } from "../utils/issues";
 import { withRetry } from "../utils/retry";
 import { logger } from "../utils/log";
 import { handleProjectItemEvent } from "../utils/projects";
+import env from "../utils/env";
 
 router.on("/webhook", async (request, response) => {
     if (response.status === 401) return;
@@ -40,5 +41,5 @@ function isValidTrigger(body: any): boolean {
     if (!sender) return false;
     const login = sender.login;
     if (!login || typeof login !== "string") return false;
-    return !login.endsWith("[bot]");
+    return login !== `${env.githubAppName}[bot]`;
 }
