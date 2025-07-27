@@ -19,6 +19,8 @@ router.on("/webhook", async (request, response) => {
 });
 
 async function handleRequest(eventName: string, body: any): Promise<void> {
+    if (!isValidTrigger(body)) return;
+
     const handlers: Record<string, (body: any) => Promise<void>> = {
         issues: handleIssueEvent,
         projects_v2_item: handleProjectItemEvent,
@@ -29,4 +31,14 @@ async function handleRequest(eventName: string, body: any): Promise<void> {
         if (!handler) return;
         await handler(body);
     }, "handle webhook event");
+}
+
+
+
+function isValidTrigger(body: any): boolean {
+    const sender = body.sender;
+    if (!sender) return false;
+    const login = sender.login;
+    if (!login || typeof login !== "string") return false;
+    return !login.endsWith("[bot]");
 }
