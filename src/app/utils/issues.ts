@@ -43,7 +43,7 @@ function isValidAction(action: any): boolean {
 
 function getValidIssue(body: any): any {
     const issue = body.issue;
-    if (!issue || !issue.number || !issue.state || issue.state !== "open") throw new Error("Invalid issue data");
+    if (!issue || !issue.number || !issue.state) throw new Error("Invalid issue data");
     return issue;
 }
 
