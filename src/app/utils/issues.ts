@@ -29,7 +29,10 @@ export async function handleIssueEvent(body: any) {
     const projectFieldOptionNodeId = await getValidProjectFieldOptionNodeId(projectId, projectType);
 
     const fieldValue = await getProjectItemFieldValue(projectNodeId, issueItemNodeId, projectFieldNodeId);
-    if (fieldValue === projectType) return;
+    if (fieldValue === projectType) {
+        logger.info(`[Issue => Project] Issue ${repoName}#${issue.number} already in ${projectName} [${projectType}], skipping`);
+        return;
+    }
 
     await setProjectItemFieldValue(projectNodeId, issueItemNodeId, projectFieldNodeId, projectFieldOptionNodeId);
 

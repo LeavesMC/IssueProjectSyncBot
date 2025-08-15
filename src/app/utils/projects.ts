@@ -33,16 +33,24 @@ export async function handleProjectItemEvent(body: any) {
     if (issueLabels.some(it => it.name === newLabelName)) return;
     if (issueLabels.some(it => newLabelType.labels.includes(it.name))) return;
 
+    const needsAddLabel = issueLabels.some(it => it.name === newLabelName);
     const forRemoval = issueLabels
         .filter(it => allStatusLabels.includes(it.name))
         .filter(it => it.name !== newLabelName);
-    if (forRemoval.length === 0) return;
 
     for (const it of forRemoval) {
         await removeLabelFromIssue(issueNodeId, it.id);
     }
-    const removedLabels = forRemoval.map(it => it.name).join(", ");
-    logger.info(`[Project => Issue] Issue ${repoName}#${issueNumber} no longer labeled as [${removedLabels}]`);
+
+    if (forRemoval.length !== 0) {
+        const removedLabels = forRemoval.map(it => it.name).join(", ");
+        logger.info(`[Project => Issue] Issue ${repoName}#${issueNumber} no longer labeled as [${removedLabels}]`);
+    }
+
+    if (!needsAddLabel) {
+        logger.info(`[Project => Issue] Issue ${repoName}#${issueNumber} already labeled as [${newLabelName}], skipping`);
+        return;
+    }
 
     await addLabelToIssue(issueNodeId, labelNodeId);
     logger.info(`[Project => Issue] Issue ${repoName}#${issueNumber} now labeled as [${newLabelName}]`);
