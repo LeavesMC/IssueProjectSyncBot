@@ -33,7 +33,7 @@ export async function handleProjectItemEvent(body: any) {
     if (issueLabels.some(it => it.name === newLabelName)) return;
     if (issueLabels.some(it => newLabelType.labels.includes(it.name))) return;
 
-    const needsAddLabel = issueLabels.some(it => it.name !== newLabelName);
+    const needsAddLabel = !issueLabels.some(it => it.name === newLabelName);
     const forRemoval = issueLabels
         .filter(it => allStatusLabels.includes(it.name))
         .filter(it => it.name !== newLabelName);
